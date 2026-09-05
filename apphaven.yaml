@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://docs.apphaven.eu/schemas/apphaven.schema.json
+version: 1
+
+services:
+  web:
+    type: container
+    build:
+      dockerfile: Dockerfile
+      context: .
+    ports:
+      - 8080
+    env:
+      PORT: "8080"
+      DATABASE_URL: ${service.db.url}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O- http://127.0.0.1:8080/healthz || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+    depends_on:
+      - service: db
+        condition: healthy
+
+  db:
+    type: postgres
+    version: "17"

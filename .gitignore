@@ -1,0 +1,5 @@
+/example-go
+*.env
+.DS_Store
+.env
+.env.*
