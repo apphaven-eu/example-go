@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	_ "embed"
 	"errors"
 	"html/template"
 	"log"
@@ -33,75 +34,10 @@ CREATE TABLE IF NOT EXISTS todos (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );`
 
-var page = template.Must(template.New("page").Parse(`<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Go Todo | AppHaven</title>
-<style>
-  * { box-sizing: border-box; }
-  input[type=text] { min-width: 0; }
-  li span { min-width: 0; overflow-wrap: anywhere; }
-  li form { flex-shrink: 0; }
-  footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #8884; font-size: .875rem; }
-  a { color: #2457bd; }
-  :focus-visible { outline: 2px solid #2457bd; outline-offset: 3px; }
+//go:embed templates/page.html
+var pageHTML string
 
-  :root { color-scheme: light; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    line-height: 1.5; margin: 0; padding: 3rem 1rem;
-  }
-  main { max-width: 640px; margin: 0 auto; }
-  h1 { font-size: 1.5rem; margin: 0 0 1.5rem; }
-  form.add { display: flex; gap: .5rem; margin-bottom: 1.5rem; }
-  input[type=text] {
-    flex: 1; padding: .55rem .7rem; font: inherit;
-    border: 1px solid #8888; border-radius: 6px; background: transparent; color: inherit;
-  }
-  button {
-    padding: .55rem .9rem; font: inherit; cursor: pointer;
-    border: 1px solid #8888; border-radius: 6px; background: transparent; color: inherit;
-  }
-  button:hover { border-color: currentColor; }
-  ul { list-style: none; margin: 0; padding: 0; }
-  li {
-    display: flex; align-items: center; gap: 1rem;
-    padding: .7rem 0; border-top: 1px solid #8883;
-  }
-  li span { flex: 1; overflow-wrap: anywhere; }
-  li form { margin: 0; }
-  li button { padding: .25rem .6rem; font-size: .85rem; }
-  p.empty { color: #8a8a8a; border-top: 1px solid #8883; padding-top: .9rem; }
-</style>
-</head>
-<body>
-<main>
-  <h1>Go Todo</h1><p>A shared task list, built with Go and PostgreSQL.</p>
-  <form class="add" method="post" action="/add">
-    <input type="text" name="title" aria-label="New task" placeholder="What needs doing?" maxlength="200" required autofocus>
-    <button type="submit">Add</button>
-  </form>
-  {{if .}}
-  <ul>
-    {{range .}}
-    <li>
-      <span>{{.Title}}</span>
-      <form method="post" action="/delete">
-        <input type="hidden" name="id" value="{{.ID}}">
-        <button type="submit">Delete</button>
-      </form>
-    </li>
-    {{end}}
-  </ul>
-  {{else}}
-  <p class="empty">No items yet.</p>
-  {{end}}
-<footer><p>Deploy your own on <a href="https://apphaven.eu">AppHaven</a> · <a href="https://github.com/apphaven-eu/example-go">Source code</a> · <a href="https://docs.apphaven.eu/getting-started">Deployment guide</a></p></footer></main>
-</body>
-</html>
-`))
+var page = template.Must(template.New("page").Parse(pageHTML))
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.LUTC)

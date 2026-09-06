@@ -8,7 +8,7 @@ The repository includes the application, a `Dockerfile`, and an `apphaven.yaml` 
 ## Stack
 
 - Go 1.25, `net/http` with the Go 1.22 route patterns
-- `html/template` for rendering, which escapes values by default
+- `html/template` for rendering, which escapes values by default; the template lives in `templates/page.html` and is compiled into the binary with `//go:embed`
 - `github.com/jackc/pgx/v5` (pgxpool), plain SQL, no ORM
 - PostgreSQL 17
 - Container: `golang:1.25-alpine` build stage, `alpine:3` runtime stage, non-root user
