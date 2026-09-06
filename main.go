@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	_ "embed"
+	"embed"
 	"errors"
 	"html/template"
 	"log"
@@ -27,15 +27,14 @@ type server struct {
 	tmpl *template.Template
 }
 
-const schema = `
-CREATE TABLE IF NOT EXISTS todos (
-  id         BIGSERIAL PRIMARY KEY,
-  title      TEXT        NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);`
+//go:embed schema.sql
+var schema string
 
 //go:embed templates/page.html
 var pageHTML string
+
+//go:embed static
+var staticFS embed.FS
 
 var page = template.Must(template.New("page").Parse(pageHTML))
 
@@ -71,6 +70,7 @@ func main() {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		_, _ = w.Write([]byte("ok"))
 	})
+	mux.Handle("GET /static/", http.FileServerFS(staticFS))
 	mux.HandleFunc("GET /{$}", s.index)
 	mux.HandleFunc("POST /add", s.add)
 	mux.HandleFunc("POST /delete", s.delete)
